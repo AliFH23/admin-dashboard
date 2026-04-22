@@ -9,6 +9,9 @@ export default function UserDetails() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +51,7 @@ export default function UserDetails() {
       <div style={styles.navbar}>
         <div style={styles.navBrand}>
           <div style={styles.navLogo}>
-            <Plane size={20} color="#fff" />
+            <Plane size={20} color="#fff" fill="#fff" />
           </div>
           <span style={styles.navTitle}>PocketPilot Admin</span>
         </div>
@@ -147,36 +150,212 @@ export default function UserDetails() {
 }
 
 const styles = {
-  page: { minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Segoe UI', sans-serif" },
-  navbar: { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "0 2rem", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
-  navBrand: { display: "flex", alignItems: "center", gap: "10px" },
-  navLogo: { width: "36px", height: "36px", background: "#2563EB", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" },
-  navTitle: { fontSize: "17px", fontWeight: "700", color: "#2563EB" },
-  navLinks: { display: "flex", gap: "2rem" },
-  navLink: { fontSize: "14px", color: "#64748b", cursor: "pointer", padding: "4px 0", display: "flex", alignItems: "center" },
-  logoutBtn: { padding: "8px 18px", background: "none", border: "1.5px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center" },
-  content: { padding: "2rem" },
-  backBtn: { background: "none", border: "none", color: "#2563EB", fontSize: "14px", cursor: "pointer", marginBottom: "1.25rem", padding: 0, fontWeight: "600", display: "flex", alignItems: "center" },
-  userCard: { display: "flex", alignItems: "center", gap: "16px", background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", marginBottom: "1.5rem" },
-  userAvatar: { width: "56px", height: "56px", borderRadius: "50%", background: "#eff6ff", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "22px", flexShrink: 0 },
-  userName: { fontSize: "18px", fontWeight: "700", color: "#1e293b" },
-  userMeta: { fontSize: "13px", color: "#64748b", marginTop: "4px" },
-  userDate: { fontSize: "12px", color: "#94a3b8", marginTop: "4px" },
-  summaryGrid: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px", marginBottom: "1.5rem" },
-  summaryCard: { background: "#fff", borderRadius: "16px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  summaryLabel: { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.05em", marginBottom: "8px" },
-  summaryNum: { fontSize: "28px", fontWeight: "700" },
-  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
-  card: { background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  cardTitle: { fontSize: "15px", fontWeight: "700", color: "#1e293b", marginBottom: "1.25rem" },
-  breakdownRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" },
-  breakdownLabel: { fontSize: "12px", color: "#64748b", width: "55px", flexShrink: 0 },
-  barTrack: { flex: 1, height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden" },
-  barFill: { height: "100%", borderRadius: "4px" },
-  txItem: { display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: "1px solid #f8fafc" },
-  txIcon: { width: "34px", height: "34px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  txInfo: { flex: 1 },
-  txTitle: { fontSize: "14px", fontWeight: "500", color: "#1e293b" },
-  txDate: { fontSize: "12px", color: "#94a3b8", marginTop: "2px" },
-  txAmt: { fontSize: "14px", fontWeight: "600" },
+  page: { 
+    minHeight: "100vh", 
+    background: "#f0f2f5", 
+    fontFamily: "'Segoe UI', sans-serif" 
+  },
+  navbar: { 
+    background: "#fff", 
+    borderBottom: "1px solid #e2e8f0", 
+    padding: "0 2rem", 
+    height: "64px", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    position: "sticky", 
+    top: 0, 
+    zIndex: 10 
+  },
+  navBrand: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px" 
+  },
+  navLogo: { 
+    width: "36px", 
+    height: "36px", 
+    background: "#2563EB", 
+    borderRadius: "10px", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  navTitle: { 
+    fontSize: "17px", 
+    fontWeight: "700", 
+    color: "#2563EB" 
+  },
+  navLinks: { 
+    display: "flex", 
+    gap: "2rem" 
+  },
+  navLink: { 
+    fontSize: "14px", 
+    color: "#64748b", 
+    cursor: "pointer", 
+    padding: "4px 0", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  logoutBtn: { 
+    padding: "8px 18px", 
+    background: "none", 
+    border: "1.5px solid #e2e8f0", 
+    borderRadius: "10px", 
+    fontSize: "13px", 
+    color: "#64748b", 
+    cursor: "pointer", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  content: { 
+    padding: "2rem" 
+  },
+  backBtn: { 
+    background: "none", 
+    border: "none", 
+    color: "#2563EB", 
+    fontSize: "14px", 
+    cursor: "pointer", 
+    marginBottom: "1.25rem", 
+    padding: 0, 
+    fontWeight: "600", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  userCard: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "16px", 
+    background: "#fff", 
+    borderRadius: "16px", 
+    padding: "1.5rem", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)", 
+    marginBottom: "1.5rem" 
+  },
+  userAvatar: { 
+    width: "56px", 
+    height: "56px", 
+    borderRadius: "50%", 
+    background: "#eff6ff", 
+    color: "#2563EB", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    fontWeight: "700", 
+    fontSize: "22px", 
+    flexShrink: 0 
+  },
+  userName: { 
+    fontSize: "18px", 
+    fontWeight: "700", 
+    color: "#1e293b" 
+  },
+  userMeta: { 
+    fontSize: "13px", 
+    color: "#64748b", 
+    marginTop: "4px" 
+  },
+  userDate: { 
+    fontSize: "12px", 
+    color: "#94a3b8", 
+    marginTop: "4px" 
+  },
+  summaryGrid: { 
+    display: "grid", 
+    gridTemplateColumns: "repeat(3,1fr)", 
+    gap: "16px", 
+    marginBottom: "1.5rem" 
+  },
+  summaryCard: { 
+    background: "#fff", 
+    borderRadius: "16px", 
+    padding: "1.25rem 1.5rem", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  summaryLabel: { 
+    fontSize: "11px", 
+    fontWeight: "700", 
+    color: "#94a3b8", 
+    letterSpacing: "0.05em", 
+    marginBottom: "8px" 
+  },
+  summaryNum: { 
+    fontSize: "28px", 
+    fontWeight: "700" 
+  },
+  row: { 
+    display: "grid", 
+    gridTemplateColumns: "1fr 1fr", 
+    gap: "16px" 
+  },
+  card: { 
+    background: "#fff", 
+    borderRadius: "16px", 
+    padding: "1.5rem", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  cardTitle: { 
+    fontSize: "15px", 
+    fontWeight: "700", 
+    color: "#1e293b", 
+    marginBottom: "1.25rem" 
+  },
+  breakdownRow: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    marginBottom: "14px" 
+  },
+  breakdownLabel: { 
+    fontSize: "12px",
+    color: "#64748b", 
+    width: "55px", 
+    flexShrink: 0 
+  },
+  barTrack: { 
+    flex: 1, 
+    height: "8px", 
+    background: "#f1f5f9", 
+    borderRadius: "4px", 
+    overflow: "hidden" 
+  },
+  barFill: { 
+    height: "100%", 
+    borderRadius: "4px" 
+  },
+  txItem: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "12px", 
+    padding: "10px 0", 
+    borderBottom: "1px solid #f8fafc" 
+  },
+  txIcon: { 
+    width: "34px", 
+    height: "34px", 
+    borderRadius: "50%", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    flexShrink: 0 
+  },
+  txInfo: { 
+    flex: 1 
+  },
+  txTitle: { 
+    fontSize: "14px", 
+    fontWeight: "500", 
+    color: "#1e293b" 
+  },
+  txDate: { 
+    fontSize: "12px", 
+    color: "#94a3b8", 
+    marginTop: "2px" 
+  },
+  txAmt: { 
+    fontSize: "14px", 
+    fontWeight: "600" 
+  },
 };

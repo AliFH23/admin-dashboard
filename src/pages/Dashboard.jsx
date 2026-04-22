@@ -49,9 +49,9 @@ export default function Dashboard() {
     <div style={styles.page}>
       <div style={styles.navbar}>
         <div style={styles.navBrand}>
-          <div style={styles.navLogo}>
-            <Plane size={20} color="#fff" style={{ transform: "rotate(-45deg)" }} />
-          </div>
+          {/* <div style={styles.navLogo}> */}  {/*  اضيف لوغو الطيارة*/}
+            {/* <Plane size={18} color="#fff" fill="#fff" style={{ transform: "rotate(-45deg)" }} /> */}
+          {/* </div> */}
           <span style={styles.navTitle}>PocketPilot Admin</span>
         </div>
         <div style={styles.navLinks}>
@@ -81,6 +81,7 @@ export default function Dashboard() {
                 <span style={styles.totalLabel}>Total Users</span>
               </div>
             </div>
+            
             {loading ? <p style={styles.loading}>Loading...</p> : <UserTable users={users} />}
           </>
         )}
@@ -96,7 +97,7 @@ export default function Dashboard() {
                 <Calendar size={22} color="#2563EB" />
                 <div>
                   <div style={styles.periodLabel}>ACTIVE PERIOD</div>
-                  <div style={styles.periodVal}>{new Date().toLocaleString("default", { month: "short", year: "numeric" })}</div>
+                  <div style={styles.periodVal}>{new Date().toLocaleString("default", { day:"numeric", month: "short", year: "numeric" })}</div>
                 </div>
               </div>
             </div>
@@ -183,35 +184,200 @@ export default function Dashboard() {
 }
 
 const styles = {
-  page: { minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Segoe UI', sans-serif" },
-  navbar: { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "0 2rem", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
-  navBrand: { display: "flex", alignItems: "center", gap: "10px" },
-  navLogo: { width: "36px", height: "36px", background: "#2563EB", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" },
-  navTitle: { fontSize: "17px", fontWeight: "700", color: "#2563EB" },
-  navLinks: { display: "flex", gap: "2rem" },
-  navLink: { fontSize: "14px", color: "#64748b", cursor: "pointer", padding: "4px 0", display: "flex", alignItems: "center" },
-  navLinkActive: { fontSize: "14px", color: "#2563EB", cursor: "pointer", padding: "4px 0", fontWeight: "600", borderBottom: "2px solid #2563EB", display: "flex", alignItems: "center" },
-  logoutBtn: { padding: "8px 18px", background: "none", border: "1.5px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center" },
-  content: { padding: "2rem" },
-  header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" },
-  headerSub: { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.08em", margin: "0 0 4px" },
-  pageTitle: { fontSize: "26px", fontWeight: "700", color: "#1e293b", margin: 0 },
-  totalBadge: { background: "#2563EB", borderRadius: "14px", padding: "12px 20px", textAlign: "center" },
-  totalNum: { display: "block", fontSize: "28px", fontWeight: "700", color: "#fff" },
-  totalLabel: { fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "600" },
-  periodBadge: { display: "flex", alignItems: "center", gap: "12px", background: "#f1f5f9", borderRadius: "14px", padding: "12px 16px" },
-  periodLabel: { fontSize: "10px", color: "#94a3b8", fontWeight: "700", letterSpacing: "0.05em" },
-  periodVal: { fontSize: "15px", fontWeight: "700", color: "#1e293b" },
-  loading: { textAlign: "center", color: "#94a3b8", marginTop: "3rem" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px", marginBottom: "1.5rem" },
-  statCard: { background: "#fff", borderRadius: "16px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  statLabel: { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.05em", marginBottom: "8px" },
+
+
+  page: { 
+    minHeight: "100vh", 
+    background: "#f0f2f5", 
+    fontFamily: "'Segoe UI', sans-serif" 
+  },
+  navbar: { 
+    background: "#fff", 
+    borderBottom: "1px solid #e2e8f0", 
+    padding: "0 2rem", 
+    height: "64px", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    position: "sticky", 
+    top: 0, 
+    zIndex: 10 
+  },
+  navBrand: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px" ,
+    
+  },
+  navLogo: { 
+    
+    width: "36px", 
+    height: "36px", 
+    background: "#2563EB", 
+    borderRadius: "10px", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  navTitle: { 
+    fontSize: "17px", 
+    fontWeight: "700", 
+    color: "#2563EB" 
+  },
+  navLinks: { 
+    display: "flex",
+    gap: "2rem" 
+  },
+  navLink: { 
+    fontSize: "14px", 
+    color: "#64748b", 
+    cursor: "pointer", 
+    padding: "4px 0", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  navLinkActive: { 
+    fontSize: "14px", 
+    color: "#2563EB", 
+    cursor: "pointer", 
+    padding: "4px 0", 
+    fontWeight: "600", 
+    borderBottom: "2px solid #2563EB", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  logoutBtn: { 
+    padding: "8px 18px", 
+    background: "none", 
+    border: "1.5px solid #e2e8f0", 
+    borderRadius: "10px", 
+    fontSize: "13px", 
+    color: "#64748b", 
+    cursor: "pointer", 
+    display: "flex", 
+    alignItems: "center" 
+  },
+  content: { 
+    padding: "2rem" 
+  },
+  header: { 
+    display: "flex", 
+    justifyContent: "space-between", 
+    alignItems: "flex-start", 
+    marginBottom: "1.5rem" 
+  },
+  headerSub: { 
+    fontSize: "11px", 
+    fontWeight: "700", 
+    color: "#94a3b8", 
+    letterSpacing: "0.08em",
+     margin: "0 0 4px" 
+    },
+  pageTitle: { 
+    fontSize: "26px", 
+    fontWeight: "700", 
+    color: "#1e293b", 
+    margin: 0 
+  },
+  totalBadge: { 
+    background: "#2563EB", 
+    borderRadius: "14px", 
+    padding: "12px 20px", 
+    textAlign: "center" 
+  },
+  totalNum: { 
+    display: "block", 
+    fontSize: "28px", 
+    fontWeight: "700", 
+    color: "#fff" 
+  },
+  totalLabel: { 
+    fontSize: "11px", 
+    color: "rgba(255,255,255,0.7)", 
+    fontWeight: "600" 
+  },
+  periodBadge: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "12px", 
+    background: "#f1f5f9", 
+    borderRadius: "14px", 
+    padding: "12px 16px" 
+  },
+  periodLabel: { 
+    fontSize: "10px", 
+    color: "#94a3b8", 
+    fontWeight: "700", 
+    letterSpacing: "0.05em" 
+  },
+  periodVal: { 
+    fontSize: "15px", 
+    fontWeight: "700", 
+    color: "#1e293b" 
+  },
+  loading: { 
+    textAlign: "center", 
+    color: "#94a3b8", 
+    marginTop: "3rem" 
+  },
+  statsGrid: { 
+    display: "grid", 
+    gridTemplateColumns: "repeat(3,1fr)", 
+    gap: "16px", 
+    marginBottom: "1.5rem" 
+  },
+  statCard: { 
+    background: "#fff", 
+    borderRadius: "16px", 
+    padding: "1.25rem 1.5rem", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  statLabel: { 
+    fontSize: "11px", 
+    fontWeight: "700", 
+    color: "#94a3b8", 
+    letterSpacing: "0.05em", 
+    marginBottom: "8px" 
+  },
   statNum: { fontSize: "28px", fontWeight: "700" },
-  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
-  card: { background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  cardTitle: { fontSize: "15px", fontWeight: "700", color: "#1e293b", marginBottom: "1.25rem" },
-  breakdownRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" },
-  breakdownLabel: { fontSize: "12px", color: "#64748b", width: "55px", flexShrink: 0 },
-  barTrack: { flex: 1, height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden" },
-  barFill: { height: "100%", borderRadius: "4px" },
+  row: { 
+    display: "grid", 
+    gridTemplateColumns: "1fr 1fr", 
+    gap: "16px" 
+  },
+  card: { 
+    background: "#fff", 
+    borderRadius: "16px", 
+    padding: "1.5rem", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  cardTitle: { 
+    fontSize: "15px", 
+    fontWeight: "700", 
+    color: "#1e293b", 
+    marginBottom: "1.25rem" 
+  },
+  breakdownRow: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    marginBottom: "14px" 
+  },
+  breakdownLabel: { 
+    fontSize: "12px", 
+    color: "#64748b", 
+    width: "55px", 
+    flexShrink: 0 
+  },
+  barTrack: { 
+    flex: 1, 
+    height: "8px", 
+    background: "#f1f5f9", 
+    borderRadius: "4px", 
+    overflow: "hidden" 
+  },
+  barFill: { 
+    height: "100%", 
+    borderRadius: "4px" 
+  },
 };

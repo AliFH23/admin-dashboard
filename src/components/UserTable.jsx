@@ -27,6 +27,7 @@ export default function UserTable({ users }) {
         <table style={styles.table}>
           <thead>
             <tr style={styles.thead}>
+              {/* <th style={styles.th}>ID</th> ضل اضيف Id */}
               <th style={styles.th}>User</th>
               <th style={styles.th}>Email</th>
               <th style={styles.th}>Phone</th>
@@ -67,16 +68,79 @@ export default function UserTable({ users }) {
 }
 
 const styles = {
-  searchWrap: { marginBottom: "1rem" },
-  searchInput: { width: "100%", padding: "12px 16px", borderRadius: "12px", border: "none", fontSize: "14px", color: "#1e293b", background: "#fff", boxSizing: "border-box", outline: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  tableWrap: { background: "#fff", borderRadius: "16px", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  table: { width: "100%", borderCollapse: "collapse" },
-  thead: { background: "#f8fafc" },
-  th: { padding: "13px 16px", textAlign: "left", fontSize: "11px", color: "#94a3b8", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.07em", borderBottom: "1px solid #f1f5f9" },
-  tr: { borderBottom: "1px solid #f8fafc", cursor: "pointer", transition: "background 0.15s" },
-  td: { padding: "13px 16px", fontSize: "14px", color: "#334155" },
-  empty: { padding: "3rem", textAlign: "center", color: "#94a3b8", fontSize: "14px" },
-  userCell: { display: "flex", alignItems: "center", gap: "10px" },
-  avatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#eff6ff", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "14px" },
-  userName: { fontWeight: "600", color: "#1e293b" },
+  searchWrap: { 
+    marginBottom: "1rem" 
+  },
+  searchInput: { 
+    width: "100%", 
+    padding: "12px 16px", 
+    borderRadius: "12px", 
+    border: "none", 
+    fontSize: "14px", 
+    color: "#1e293b", 
+    background: "#fff", 
+    boxSizing: "border-box", 
+    outline: "none", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  tableWrap: { 
+    background: "#fff", 
+    borderRadius: "16px", 
+    overflow: "hidden", 
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
+  },
+  table: { 
+    width: "100%", 
+    borderCollapse: "collapse" 
+  },
+  thead: { 
+    background: "#f8fafc" 
+  },
+  th: { 
+    padding: "13px 16px", 
+    textAlign: "left", 
+    fontSize: "11px", 
+    color: "#94a3b8", 
+    fontWeight: "700", 
+    textTransform: "uppercase", 
+    letterSpacing: "0.07em", 
+    borderBottom: "1px solid #f1f5f9" 
+  },
+  tr: { 
+    borderBottom: "1px solid #f8fafc", 
+    cursor: "pointer", 
+    transition: "background 0.15s" 
+  },
+  td: { 
+    padding: "13px 16px", 
+    fontSize: "14px", 
+    color: "#334155" 
+  },
+  empty: { 
+    padding: "3rem", 
+    textAlign: "center", 
+    color: "#94a3b8", 
+    fontSize: "14px" 
+  },
+  userCell: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px" 
+  },
+  avatar: { 
+    width: "36px", 
+    height: "36px", 
+    borderRadius: "50%", 
+    background: "#eff6ff", 
+    color: "#2563EB", 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    fontWeight: "700", 
+    fontSize: "14px" 
+  },
+  userName: { 
+    fontWeight: "600", 
+    color: "#1e293b" 
+  },
 };
