@@ -25,12 +25,12 @@ export default function Login() {
     // ايميل ديمو
     //==============
 
-    
+    /*
     if (email === "admin@demo.com" && password === "123456") {
         localStorage.setItem("token", "demo-token");
         navigate("/dashboard");
         return;
-        }
+        }*/
 
 
     try {

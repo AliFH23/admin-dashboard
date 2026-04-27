@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Users, BarChart2, LogOut, Calendar } from "lucide-react";
+import { Users, BarChart2, LogOut } from "lucide-react";
 import api from "../api/axios";
 import UserTable from "../components/UserTable";
 
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("users");
-  const [users, setUsers] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers]           = useState([]);
+  const [stats, setStats]           = useState(null);
+  const [loading, setLoading]       = useState(true);
+  const [statsMonth, setStatsMonth] = useState(new Date().getMonth() + 1);
+  const [statsYear, setStatsYear]   = useState(new Date().getFullYear());
   const navigate = useNavigate();
 
   useEffect(() => { fetchUsers(); }, []);
@@ -23,15 +27,17 @@ export default function Dashboard() {
     } finally { setLoading(false); }
   };
 
-  const fetchStats = async () => {
-    if (stats) return;
+  const fetchStats = async (month, year) => {
     setLoading(true);
+    setStats(null);
     try {
-      const allStats = await Promise.all(users.map((u) => api.get(`/admin/users/${u._id}/stats`)));
-      const totalIncome = allStats.reduce((sum, r) => sum + (r.data.data.summary?.income?.total || 0), 0);
-      const totalExpenses = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.total || 0), 0);
-      const fixed = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.fixed?.total || 0), 0);
-      const variable = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.variable?.total || 0), 0);
+      const allStats = await Promise.all(
+        users.map((u) => api.get(`/admin/users/${u._id}/stats?month=${month}&year=${year}`))
+      );
+      const totalIncome   = allStats.reduce((sum, r) => sum + (r.data.data.summary?.income?.total    || 0), 0);
+      const totalExpenses = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.total  || 0), 0);
+      const fixed         = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.fixed?.total    || 0), 0);
+      const variable      = allStats.reduce((sum, r) => sum + (r.data.data.summary?.expenses?.variable?.total || 0), 0);
       setStats({ totalIncome, totalExpenses, balance: totalIncome - totalExpenses, fixed, variable });
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -39,7 +45,7 @@ export default function Dashboard() {
 
   const handlePageChange = (page) => {
     setActivePage(page);
-    if (page === "stats") fetchStats();
+    if (page === "stats") fetchStats(statsMonth, statsYear);
   };
 
   const handleLogout = () => { localStorage.removeItem("token"); navigate("/"); };
@@ -47,18 +53,22 @@ export default function Dashboard() {
 
   return (
     <div style={styles.page}>
+      {/* Navbar */}
       <div style={styles.navbar}>
         <div style={styles.navBrand}>
-          {/* <div style={styles.navLogo}> */}  {/*  اضيف لوغو الطيارة*/}
-            {/* <Plane size={18} color="#fff" fill="#fff" style={{ transform: "rotate(-45deg)" }} /> */}
-          {/* </div> */}
           <span style={styles.navTitle}>PocketPilot Admin</span>
         </div>
         <div style={styles.navLinks}>
-          <span style={activePage === "users" ? styles.navLinkActive : styles.navLink} onClick={() => handlePageChange("users")}>
+          <span
+            style={activePage === "users" ? styles.navLinkActive : styles.navLink}
+            onClick={() => handlePageChange("users")}
+          >
             <Users size={15} style={{ marginRight: "6px", verticalAlign: "middle" }} />Users
           </span>
-          <span style={activePage === "stats" ? styles.navLinkActive : styles.navLink} onClick={() => handlePageChange("stats")}>
+          <span
+            style={activePage === "stats" ? styles.navLinkActive : styles.navLink}
+            onClick={() => handlePageChange("stats")}
+          >
             <BarChart2 size={15} style={{ marginRight: "6px", verticalAlign: "middle" }} />Statistics
           </span>
         </div>
@@ -69,6 +79,7 @@ export default function Dashboard() {
 
       <div style={styles.content}>
 
+        {/* ── Users Page ── */}
         {activePage === "users" && (
           <>
             <div style={styles.header}>
@@ -81,11 +92,14 @@ export default function Dashboard() {
                 <span style={styles.totalLabel}>Total Users</span>
               </div>
             </div>
-            
-            {loading ? <p style={styles.loading}>Loading...</p> : <UserTable users={users} />}
+            {loading
+              ? <p style={styles.loading}>Loading...</p>
+              : <UserTable users={users} />
+            }
           </>
         )}
 
+        {/* ── Statistics Page ── */}
         {activePage === "stats" && (
           <>
             <div style={styles.header}>
@@ -93,12 +107,36 @@ export default function Dashboard() {
                 <p style={styles.headerSub}>FINANCIAL ANALYSIS</p>
                 <h1 style={styles.pageTitle}>Statistics</h1>
               </div>
-              <div style={styles.periodBadge}>
-                <Calendar size={22} color="#2563EB" />
-                <div>
-                  <div style={styles.periodLabel}>ACTIVE PERIOD</div>
-                  <div style={styles.periodVal}>{new Date().toLocaleString("default", { day:"numeric", month: "short", year: "numeric" })}</div>
-                </div>
+
+              {/* Month / Year Selector */}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <select
+                  value={statsMonth}
+                  onChange={(e) => {
+                    const m = Number(e.target.value);
+                    setStatsMonth(m);
+                    fetchStats(m, statsYear);
+                  }}
+                  style={styles.select}
+                >
+                  {MONTHS.map((m, i) => (
+                    <option key={i} value={i + 1}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={statsYear}
+                  onChange={(e) => {
+                    const y = Number(e.target.value);
+                    setStatsYear(y);
+                    fetchStats(statsMonth, y);
+                  }}
+                  style={styles.select}
+                >
+                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                  ))}    {/*  لما اختار السنة بكون تلقائي في السنة الحالية  */}
+                         {/* و بكون حاط سنتين قبل و سنتين بعد  */}
+                </select>
               </div>
             </div>
 
@@ -120,6 +158,7 @@ export default function Dashboard() {
                 </div>
 
                 <div style={styles.row}>
+                  {/* Expenses Breakdown */}       {/* هون احصائية لل fixed , var */}
                   <div style={styles.card}>
                     <div style={styles.cardTitle}>Expenses Breakdown</div>
                     <div style={styles.breakdownRow}>
@@ -138,6 +177,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* Cash Flow */}            
                   <div style={styles.card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                       <div style={styles.cardTitle}>Cash Flow</div>
@@ -161,12 +201,12 @@ export default function Dashboard() {
                       </svg>
                       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                         <div>
-                          <div style={{ fontSize: "11px", color: "#2563EB", fontWeight: "700" }}> INCOME</div>
+                          <div style={{ fontSize: "11px", color: "#2563EB", fontWeight: "700" }}>INCOME</div>
                           <div style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b" }}>${stats.totalIncome.toLocaleString()}</div>
                           <div style={{ fontSize: "11px", color: "#94a3b8" }}>{Math.round(stats.totalIncome / (stats.totalIncome + stats.totalExpenses) * 100) || 0}%</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: "11px", color: "#F59E0B", fontWeight: "700" }}> EXPENSES</div>
+                          <div style={{ fontSize: "11px", color: "#F59E0B", fontWeight: "700" }}>EXPENSES</div>
                           <div style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b" }}>${stats.totalExpenses.toLocaleString()}</div>
                           <div style={{ fontSize: "11px", color: "#94a3b8" }}>{Math.round(stats.totalExpenses / (stats.totalIncome + stats.totalExpenses) * 100) || 0}%</div>
                         </div>
@@ -184,200 +224,32 @@ export default function Dashboard() {
 }
 
 const styles = {
-
-
-  page: { 
-    minHeight: "100vh", 
-    background: "#f0f2f5", 
-    fontFamily: "'Segoe UI', sans-serif" 
-  },
-  navbar: { 
-    background: "#fff", 
-    borderBottom: "1px solid #e2e8f0", 
-    padding: "0 2rem", 
-    height: "64px", 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    position: "sticky", 
-    top: 0, 
-    zIndex: 10 
-  },
-  navBrand: { 
-    display: "flex", 
-    alignItems: "center", 
-    gap: "10px" ,
-    
-  },
-  navLogo: { 
-    
-    width: "36px", 
-    height: "36px", 
-    background: "#2563EB", 
-    borderRadius: "10px", 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center" 
-  },
-  navTitle: { 
-    fontSize: "17px", 
-    fontWeight: "700", 
-    color: "#2563EB" 
-  },
-  navLinks: { 
-    display: "flex",
-    gap: "2rem" 
-  },
-  navLink: { 
-    fontSize: "14px", 
-    color: "#64748b", 
-    cursor: "pointer", 
-    padding: "4px 0", 
-    display: "flex", 
-    alignItems: "center" 
-  },
-  navLinkActive: { 
-    fontSize: "14px", 
-    color: "#2563EB", 
-    cursor: "pointer", 
-    padding: "4px 0", 
-    fontWeight: "600", 
-    borderBottom: "2px solid #2563EB", 
-    display: "flex", 
-    alignItems: "center" 
-  },
-  logoutBtn: { 
-    padding: "8px 18px", 
-    background: "none", 
-    border: "1.5px solid #e2e8f0", 
-    borderRadius: "10px", 
-    fontSize: "13px", 
-    color: "#64748b", 
-    cursor: "pointer", 
-    display: "flex", 
-    alignItems: "center" 
-  },
-  content: { 
-    padding: "2rem" 
-  },
-  header: { 
-    display: "flex", 
-    justifyContent: "space-between", 
-    alignItems: "flex-start", 
-    marginBottom: "1.5rem" 
-  },
-  headerSub: { 
-    fontSize: "11px", 
-    fontWeight: "700", 
-    color: "#94a3b8", 
-    letterSpacing: "0.08em",
-     margin: "0 0 4px" 
-    },
-  pageTitle: { 
-    fontSize: "26px", 
-    fontWeight: "700", 
-    color: "#1e293b", 
-    margin: 0 
-  },
-  totalBadge: { 
-    background: "#2563EB", 
-    borderRadius: "14px", 
-    padding: "12px 20px", 
-    textAlign: "center" 
-  },
-  totalNum: { 
-    display: "block", 
-    fontSize: "28px", 
-    fontWeight: "700", 
-    color: "#fff" 
-  },
-  totalLabel: { 
-    fontSize: "11px", 
-    color: "rgba(255,255,255,0.7)", 
-    fontWeight: "600" 
-  },
-  periodBadge: { 
-    display: "flex", 
-    alignItems: "center", 
-    gap: "12px", 
-    background: "#f1f5f9", 
-    borderRadius: "14px", 
-    padding: "12px 16px" 
-  },
-  periodLabel: { 
-    fontSize: "10px", 
-    color: "#94a3b8", 
-    fontWeight: "700", 
-    letterSpacing: "0.05em" 
-  },
-  periodVal: { 
-    fontSize: "15px", 
-    fontWeight: "700", 
-    color: "#1e293b" 
-  },
-  loading: { 
-    textAlign: "center", 
-    color: "#94a3b8", 
-    marginTop: "3rem" 
-  },
-  statsGrid: { 
-    display: "grid", 
-    gridTemplateColumns: "repeat(3,1fr)", 
-    gap: "16px", 
-    marginBottom: "1.5rem" 
-  },
-  statCard: { 
-    background: "#fff", 
-    borderRadius: "16px", 
-    padding: "1.25rem 1.5rem", 
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
-  },
-  statLabel: { 
-    fontSize: "11px", 
-    fontWeight: "700", 
-    color: "#94a3b8", 
-    letterSpacing: "0.05em", 
-    marginBottom: "8px" 
-  },
-  statNum: { fontSize: "28px", fontWeight: "700" },
-  row: { 
-    display: "grid", 
-    gridTemplateColumns: "1fr 1fr", 
-    gap: "16px" 
-  },
-  card: { 
-    background: "#fff", 
-    borderRadius: "16px", 
-    padding: "1.5rem", 
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)" 
-  },
-  cardTitle: { 
-    fontSize: "15px", 
-    fontWeight: "700", 
-    color: "#1e293b", 
-    marginBottom: "1.25rem" 
-  },
-  breakdownRow: { 
-    display: "flex", 
-    alignItems: "center", 
-    gap: "10px", 
-    marginBottom: "14px" 
-  },
-  breakdownLabel: { 
-    fontSize: "12px", 
-    color: "#64748b", 
-    width: "55px", 
-    flexShrink: 0 
-  },
-  barTrack: { 
-    flex: 1, 
-    height: "8px", 
-    background: "#f1f5f9", 
-    borderRadius: "4px", 
-    overflow: "hidden" 
-  },
-  barFill: { 
-    height: "100%", 
-    borderRadius: "4px" 
-  },
+  page:         { minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Segoe UI', sans-serif" },
+  navbar:       { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "0 2rem", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
+  navBrand:     { display: "flex", alignItems: "center", gap: "10px" },
+  navTitle:     { fontSize: "17px", fontWeight: "700", color: "#2563EB" },
+  navLinks:     { display: "flex", gap: "2rem" },
+  navLink:      { fontSize: "14px", color: "#64748b", cursor: "pointer", padding: "4px 0", display: "flex", alignItems: "center" },
+  navLinkActive:{ fontSize: "14px", color: "#2563EB", cursor: "pointer", padding: "4px 0", fontWeight: "600", borderBottom: "2px solid #2563EB", display: "flex", alignItems: "center" },
+  logoutBtn:    { padding: "8px 18px", background: "none", border: "1.5px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center" },
+  content:      { padding: "2rem" },
+  header:       { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" },
+  headerSub:    { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.08em", margin: "0 0 4px" },
+  pageTitle:    { fontSize: "26px", fontWeight: "700", color: "#1e293b", margin: 0 },
+  totalBadge:   { background: "#2563EB", borderRadius: "14px", padding: "12px 20px", textAlign: "center" },
+  totalNum:     { display: "block", fontSize: "28px", fontWeight: "700", color: "#fff" },
+  totalLabel:   { fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "600" },
+  select:       { padding: "8px 12px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", color: "#1e293b", outline: "none", cursor: "pointer", background: "#fff" },
+  loading:      { textAlign: "center", color: "#94a3b8", marginTop: "3rem" },
+  statsGrid:    { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px", marginBottom: "1.5rem" },
+  statCard:     { background: "#fff", borderRadius: "16px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  statLabel:    { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.05em", marginBottom: "8px" },
+  statNum:      { fontSize: "28px", fontWeight: "700" },
+  row:          { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
+  card:         { background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
+  cardTitle:    { fontSize: "15px", fontWeight: "700", color: "#1e293b", marginBottom: "1.25rem" },
+  breakdownRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" },
+  breakdownLabel:{ fontSize: "12px", color: "#64748b", width: "55px", flexShrink: 0 },
+  barTrack:     { flex: 1, height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden" },
+  barFill:      { height: "100%", borderRadius: "4px" },
 };
