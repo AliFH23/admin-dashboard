@@ -27,7 +27,6 @@ export default function UserTable({ users }) {
         <table style={styles.table}>
           <thead>
             <tr style={styles.thead}>
-              {/* <th style={styles.th}>ID</th> ضل اضيف Id */}
               <th style={styles.th}>User</th>
               <th style={styles.th}>Email</th>
               <th style={styles.th}>Phone</th>

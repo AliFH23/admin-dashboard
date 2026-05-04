@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Users, BarChart2, LogOut } from "lucide-react";
 import api from "../api/axios";
 import UserTable from "../components/UserTable";
+import styles from "../styles/dashboardStyles"; 
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -15,11 +16,13 @@ export default function Dashboard() {
   const [statsYear, setStatsYear]   = useState(new Date().getFullYear());
   const navigate = useNavigate();
 
+  // لما الصفحة تفتح أول مرة => جيب اليوزرز تلقائياً 
   useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      // GET http://localhost:8000/api/admin/users 
       const res = await api.get("/admin/users");
       setUsers(res.data.data.users);
     } catch (err) {
@@ -27,6 +30,7 @@ export default function Dashboard() {
     } finally { setLoading(false); }
   };
 
+  // بتجيب إحصائيات كل اليوزرز للشهر والسنة المحددين 
   const fetchStats = async (month, year) => {
     setLoading(true);
     setStats(null);
@@ -43,12 +47,16 @@ export default function Dashboard() {
     finally { setLoading(false); }
   };
 
+  //لما اضغط على Users او Statistics
   const handlePageChange = (page) => {
     setActivePage(page);
-    if (page === "stats") fetchStats(statsMonth, statsYear);
+    if (page === "stats") fetchStats(statsMonth, statsYear); // هون اذا احتا في صفحة Statistics جيب الاحصائيات
   };
 
-  const handleLogout = () => { localStorage.removeItem("token"); navigate("/"); };
+  const handleLogout = () => {
+     localStorage.removeItem("token"); 
+     navigate("/"); 
+    };
   const total = users.length;
 
   return (
@@ -88,7 +96,7 @@ export default function Dashboard() {
                 <h1 style={styles.pageTitle}>User Management</h1>
               </div>
               <div style={styles.totalBadge}>
-                <span style={styles.totalNum}>{total}</span>
+                <span style={styles.totalNum}>{total}</span> {/*يعرض عدد اليوزرز*/} 
                 <span style={styles.totalLabel}>Total Users</span>
               </div>
             </div>
@@ -132,10 +140,12 @@ export default function Dashboard() {
                   }}
                   style={styles.select}
                 >
-                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                  ))}    {/*  لما اختار السنة بكون تلقائي في السنة الحالية  */}
-                         {/* و بكون حاط سنتين قبل و سنتين بعد  */}
+                  {Array.from(
+                    { length: new Date().getFullYear() - 2024 + 3 },
+                    (_, i) => 2024 + i
+                  ).map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -158,7 +168,7 @@ export default function Dashboard() {
                 </div>
 
                 <div style={styles.row}>
-                  {/* Expenses Breakdown */}       {/* هون احصائية لل fixed , var */}
+                  {/* Expenses Breakdown */}
                   <div style={styles.card}>
                     <div style={styles.cardTitle}>Expenses Breakdown</div>
                     <div style={styles.breakdownRow}>
@@ -177,7 +187,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Cash Flow */}            
+                  {/* Cash Flow */}
                   <div style={styles.card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                       <div style={styles.cardTitle}>Cash Flow</div>
@@ -222,34 +232,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-const styles = {
-  page:         { minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Segoe UI', sans-serif" },
-  navbar:       { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "0 2rem", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
-  navBrand:     { display: "flex", alignItems: "center", gap: "10px" },
-  navTitle:     { fontSize: "17px", fontWeight: "700", color: "#2563EB" },
-  navLinks:     { display: "flex", gap: "2rem" },
-  navLink:      { fontSize: "14px", color: "#64748b", cursor: "pointer", padding: "4px 0", display: "flex", alignItems: "center" },
-  navLinkActive:{ fontSize: "14px", color: "#2563EB", cursor: "pointer", padding: "4px 0", fontWeight: "600", borderBottom: "2px solid #2563EB", display: "flex", alignItems: "center" },
-  logoutBtn:    { padding: "8px 18px", background: "none", border: "1.5px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center" },
-  content:      { padding: "2rem" },
-  header:       { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" },
-  headerSub:    { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.08em", margin: "0 0 4px" },
-  pageTitle:    { fontSize: "26px", fontWeight: "700", color: "#1e293b", margin: 0 },
-  totalBadge:   { background: "#2563EB", borderRadius: "14px", padding: "12px 20px", textAlign: "center" },
-  totalNum:     { display: "block", fontSize: "28px", fontWeight: "700", color: "#fff" },
-  totalLabel:   { fontSize: "11px", color: "rgba(255,255,255,0.7)", fontWeight: "600" },
-  select:       { padding: "8px 12px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", color: "#1e293b", outline: "none", cursor: "pointer", background: "#fff" },
-  loading:      { textAlign: "center", color: "#94a3b8", marginTop: "3rem" },
-  statsGrid:    { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px", marginBottom: "1.5rem" },
-  statCard:     { background: "#fff", borderRadius: "16px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  statLabel:    { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.05em", marginBottom: "8px" },
-  statNum:      { fontSize: "28px", fontWeight: "700" },
-  row:          { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
-  card:         { background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  cardTitle:    { fontSize: "15px", fontWeight: "700", color: "#1e293b", marginBottom: "1.25rem" },
-  breakdownRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" },
-  breakdownLabel:{ fontSize: "12px", color: "#64748b", width: "55px", flexShrink: 0 },
-  barTrack:     { flex: 1, height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden" },
-  barFill:      { height: "100%", borderRadius: "4px" },
-};

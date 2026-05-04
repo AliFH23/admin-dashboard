@@ -2,28 +2,29 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Users, BarChart2, LogOut, ArrowLeft, TrendingUp, TrendingDown } from "lucide-react";
 import api from "../api/axios";
+import styles from "../styles/userDetailsStyles"; // ✅ استيراد الـ styles
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 export default function UserDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser]   = useState(null);
-  const [stats, setStats] = useState(null);
+  const [user, setUser]       = useState(null);
+  const [stats, setStats]     = useState(null);
   const [loading, setLoading] = useState(true);
-
-  //  شهر وسنة
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [year, setYear]   = useState(new Date().getFullYear());
+  const [month, setMonth]     = useState(new Date().getMonth() + 1);
+  const [year, setYear]       = useState(new Date().getFullYear());
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [usersRes, statsRes] = await Promise.all([
-          api.get("/admin/users"),
-          api.get(`/admin/users/${id}/stats?month=${month}&year=${year}`), // ✅
+        const [userRes, statsRes] = await Promise.all([
+          api.get(`/admin/users/${id}`),
+          api.get(`/admin/users/${id}/stats?month=${month}&year=${year}`),
         ]);
-        const foundUser = usersRes.data.data.users.find((u) => u._id === id);
-        setUser(foundUser);
+        
+        setUser(userRes.data.data.user);
         setStats(statsRes.data.data);
       } catch (err) {
         if (err.response?.status === 401) {
@@ -35,19 +36,17 @@ export default function UserDetails() {
       }
     };
     fetchData();
-  }, [id, month, year]); //  يتحدث لما يتغير الشهر أو السنة
+  }, [id, month, year]);
 
   if (loading) return <div style={{ padding: "2rem", color: "#94a3b8", fontFamily: "'Segoe UI', sans-serif" }}>Loading...</div>;
   if (!user)   return <div style={{ padding: "2rem" }}>User not found</div>;
 
-  const income        = stats?.summary?.income?.total    || 0;
-  const totalExpenses = stats?.summary?.expenses?.total  || 0;
-  const fixed         = stats?.summary?.expenses?.fixed?.total    || 0;
-  const variable      = stats?.summary?.expenses?.variable?.total || 0;
-  const balance       = stats?.summary?.balance || 0;
-  const recent        = stats?.recent || [];
-
-  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const income        = stats?.summary?.income?.total               || 0;
+  const totalExpenses = stats?.summary?.expenses?.total             || 0;
+  const fixed         = stats?.summary?.expenses?.fixed?.total      || 0;
+  const variable      = stats?.summary?.expenses?.variable?.total   || 0;
+  const balance       = stats?.summary?.balance                     || 0;
+  const recent        = stats?.recent                               || [];
 
   return (
     <div style={styles.page}>
@@ -86,26 +85,20 @@ export default function UserDetails() {
             </div>
           </div>
 
-          {/*  Month/Year Selector */}
+          {/* Month/Year Selector */}
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <select
-              value={month}
-              onChange={(e) => setMonth(Number(e.target.value))}
-              style={styles.select}
-            >
+            <select value={month} onChange={(e) => setMonth(Number(e.target.value))} style={styles.select}>
               {MONTHS.map((m, i) => (
                 <option key={i} value={i + 1}>{m}</option>
               ))}
             </select>
-            <select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              style={styles.select}
-            >
-              {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((y) => (
+            <select value={year} onChange={(e) => setYear(Number(e.target.value))} style={styles.select}>
+              {Array.from(
+                { length: new Date().getFullYear() - 2024 + 3 },
+                (_, i) => 2024 + i
+              ).map((y) => (
                 <option key={y} value={y}>{y}</option>
-              ))}        {/*  لما اختار السنة بكون تلقائي في السنة الحالية  */}
-                         {/* و بكون حاط سنتين قبل و سنتين بعد  */}
+              ))}
             </select>
           </div>
         </div>
@@ -130,6 +123,7 @@ export default function UserDetails() {
           {/* Expenses Breakdown */}
           <div style={styles.card}>
             <div style={styles.cardTitle}>Expenses Breakdown</div>
+            {/* <div style={{ maxHeight: "300px", overflowY: "auto" }}></div> */}
             <div style={styles.breakdownRow}>
               <span style={styles.breakdownLabel}>Fixed</span>
               <div style={styles.barTrack}>
@@ -180,38 +174,3 @@ export default function UserDetails() {
     </div>
   );
 }
-
-const styles = {
-  page:     { minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Segoe UI', sans-serif" },
-  navbar:   { background: "#fff", borderBottom: "1px solid #e2e8f0", padding: "0 2rem", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 },
-  navBrand: { display: "flex", alignItems: "center", gap: "10px" },
-  navTitle: { fontSize: "17px", fontWeight: "700", color: "#2563EB" },
-  navLinks: { display: "flex", gap: "2rem" },
-  navLink:  { fontSize: "14px", color: "#64748b", cursor: "pointer", padding: "4px 0", display: "flex", alignItems: "center" },
-  logoutBtn:{ padding: "8px 18px", background: "none", border: "1.5px solid #e2e8f0", borderRadius: "10px", fontSize: "13px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center" },
-  content:  { padding: "2rem" },
-  backBtn:  { background: "none", border: "none", color: "#2563EB", fontSize: "14px", cursor: "pointer", marginBottom: "1.25rem", padding: 0, fontWeight: "600", display: "flex", alignItems: "center" },
-  userCard: { display: "flex", alignItems: "center", gap: "16px", background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", marginBottom: "1.5rem" },
-  userAvatar: { width: "56px", height: "56px", borderRadius: "50%", background: "#eff6ff", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "22px", flexShrink: 0 },
-  userName: { fontSize: "18px", fontWeight: "700", color: "#1e293b" },
-  userMeta: { fontSize: "13px", color: "#64748b", marginTop: "4px" },
-  userDate: { fontSize: "12px", color: "#94a3b8", marginTop: "4px" },
-  select:   { padding: "8px 12px", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", color: "#1e293b", outline: "none", cursor: "pointer", background: "#f8fafc" },
-  summaryGrid: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px", marginBottom: "1.5rem" },
-  summaryCard: { background: "#fff", borderRadius: "16px", padding: "1.25rem 1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  summaryLabel: { fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.05em", marginBottom: "8px" },
-  summaryNum: { fontSize: "28px", fontWeight: "700" },
-  row:      { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" },
-  card:     { background: "#fff", borderRadius: "16px", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" },
-  cardTitle:{ fontSize: "15px", fontWeight: "700", color: "#1e293b", marginBottom: "1.25rem" },
-  breakdownRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" },
-  breakdownLabel: { fontSize: "12px", color: "#64748b", width: "55px", flexShrink: 0 },
-  barTrack: { flex: 1, height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden" },
-  barFill:  { height: "100%", borderRadius: "4px" },
-  txItem:   { display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: "1px solid #f8fafc" },
-  txIcon:   { width: "34px", height: "34px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  txInfo:   { flex: 1 },
-  txTitle:  { fontSize: "14px", fontWeight: "500", color: "#1e293b" },
-  txDate:   { fontSize: "12px", color: "#94a3b8", marginTop: "2px" },
-  txAmt:    { fontSize: "14px", fontWeight: "600" },
-};
